@@ -66,6 +66,9 @@ class Grade(models.Model):
 
 class List_Of_Control_Activities(models.Model):
     """ Лист контрольных мероприятий """
+    faculty = models.CharField(max_length=350, verbose_name='факультет')
+    dean = models.CharField(max_length=350, verbose_name='декан')
+    date_of_approval = models.DateField(verbose_name='дата утверждения')
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Учитель')
     department = models.CharField(max_length=350, verbose_name='Кафедра')
     discipline = models.CharField(max_length=350, verbose_name='Дисциплина')
@@ -92,7 +95,12 @@ class List_Of_Control_Activities_Value(models.Model):
     order_holding = models.CharField(verbose_name='Порядок проведения', max_length=350)
     evaluation_scale = models.CharField(verbose_name='Шкала оценивания', max_length=350)
     evaluation_criteria = models.TextField(verbose_name='Критерии оценивания')
-    value = models.ForeignKey(List_Of_Control_Activities, verbose_name='Содержание', on_delete=models.CASCADE)
+    value = models.ForeignKey(
+        List_Of_Control_Activities,
+        verbose_name='Содержание',
+        on_delete=models.CASCADE,
+        related_name='lca_items'
+    )
 
     class Meta:
         verbose_name = ' Лист контрольных мероприятий содержание'

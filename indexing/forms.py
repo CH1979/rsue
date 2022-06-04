@@ -42,6 +42,25 @@ class AddList(forms.ModelForm):
         model = List_Of_Control_Activities
         fields = "__all__"
 
+        widgets = {
+            'date_of_approval': forms.DateInput(
+                format=('%Y/%m/%d'),
+                attrs={
+                    'class': 'form-control', 
+                    'type': 'date',
+                    'value': '2022-06-03'
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(AddList, self).__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            if visible.name == 'group':
+                visible.field.widget.attrs['class'] = "form-select"
+            else:
+                visible.field.widget.attrs['class'] = "form-control"
+
 
 class AddValue(forms.ModelForm):
     """ Форма создания содержимого в листе контрольных мероприятий """

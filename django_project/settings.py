@@ -25,7 +25,12 @@ SECRET_KEY = 'fuUuTJboappZ4AYWihR8HeBfGWd1BKm3WNBeiYvocJisWkuiqpiqRNx0q8bYHXb9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['80.78.244.111', '2a00:f940:2:4:2::3dff', '80-78-244-111.cloudvps.regruhosting.ru']
+ALLOWED_HOSTS = [
+    '80.78.244.111',
+    '2a00:f940:2:4:2::3dff',
+    '80-78-244-111.cloudvps.regruhosting.ru',
+    '127.0.0.1'
+]
 
 
 # Application definition
@@ -111,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
