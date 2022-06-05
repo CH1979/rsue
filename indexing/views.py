@@ -1,14 +1,27 @@
+from itertools import islice
+
 from django.shortcuts import render, redirect
-from django.views.generic import TemplateView, FormView, CreateView, UpdateView, DetailView, ListView
+from django.urls import reverse, reverse_lazy
+from django.views.generic import (
+    CreateView,
+    UpdateView,
+    DetailView,
+    ListView,
+    DeleteView,
+)
 
-from .forms import AddStudent, AddGroupStudent, AddLecture, AddGrade, AddValue, AddList
+from .forms import (
+    AddStudent,
+    AddGroupStudent,
+    AddLecture,
+    AddGrade,
+    AddValue,
+    AddList,
+    CheckPointFormSet,
+    GSSForm,
+    LCAForm
+)
 from .models import *
-
-from django.http import FileResponse
-import io
-from reportlab.pdfgen import canvas
-from reportlab.lib.units import inch
-from reportlab.lib.pagesizes import letter
 
 
 def index(request):
@@ -198,3 +211,102 @@ class Pdfer(ListView):
     model = List_Of_Control_Activities_Value
     template_name = 'pdf/index.html'
     context_object_name = 'serv'
+
+
+class LCACreateView(CreateView):
+    template_name = 'profile/create_lca.html'
+    form_class = LCAForm
+    
+    def get_success_url(self):
+        return reverse('Index:lca-detail', kwargs={'pk': self.object.pk})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['checkpoint_formset'] = CheckPointFormSet()
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super(LCACreateView, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        checkpoint_formset = CheckPointFormSet(self.request.POST or None)
+        if form.is_valid() and checkpoint_formset.is_valid():
+            return self.form_valid(form, checkpoint_formset)
+        else:
+            return self.form_invalid(form, checkpoint_formset)
+
+    def form_valid(self, form, checkpoint_formset):
+        self.object = form.save(commit=False)
+        self.object.save()
+        checkpoints = checkpoint_formset.save(commit=False)
+        for checkpoint in checkpoints:
+            checkpoint.lca = self.object
+            checkpoint.save()
+        return redirect(self.get_success_url())
+
+    def form_invalid(self, form, checkpoint_formset):
+        return self.render_to_response(
+            self.get_context_data(
+                form=form,
+                checkpoint_formset=checkpoint_formset
+            )
+        )
+
+
+class LCADetailView(DetailView):
+    model = List_Of_Control_Activities
+    template_name = 'profile/lca_detail.html'
+
+
+class LCAPrintView(DetailView):
+    model = List_Of_Control_Activities
+    template_name = 'pdf/lca_detail.html'
+
+
+class LCADeleteView(DeleteView):
+    model = List_Of_Control_Activities
+    success_url = reverse_lazy('Index:table-list')
+
+
+class GradeServiceCreateView(CreateView):
+    model = GradeService
+    fields = '__all__'
+    template_name = 'profile/create_grade_service.html'
+    success_url = reverse_lazy('Index:profile')
+
+
+class FormHoldingCreateView(CreateView):
+    model = FormHolding
+    fields = '__all__'
+    template_name = 'profile/create_form_holding.html'
+    success_url = reverse_lazy('Index:profile')
+
+
+class OrderHoldingCreateView(CreateView):
+    model = OrderHolding
+    fields = '__all__'
+    template_name = 'profile/create_order_holding.html'
+    success_url = reverse_lazy('Index:profile')
+
+
+class GradeServiceSetCreateView(CreateView):
+    form_class = GSSForm
+    template_name = 'profile/create_gss.html'
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.save()
+
+        n = int(form['evaluation_quantity'].value())
+        objs = [GradeItem(grade_service_set=self.object) for i in range(n)]
+        GradeItem.objects.bulk_create(objs)
+
+        return redirect(
+            'Index:lca-detail',
+            kwargs={'pk': self.object.check_point.lca.pk}
+        )

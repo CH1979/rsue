@@ -17,7 +17,7 @@
                                 {% for field in form %}
                                     <div class="form-group row">
                                         <span class="text-danger">{{ field.errors }}</span>
-                                        <label class="control-label col-sm-3 align-self-center mb-0" for="email1">
+                                        <label class="control-label col-sm-3 align-self-center mb-0">
                                             {{ field.label_tag }}
                                         </label>
                                         <div class="col-sm-9">
@@ -28,6 +28,14 @@
                                         {% endif %}
                                     </div>
                                 {% endfor %}
+                                <h4>Контрольные точки</h4>
+                                {{ checkpoint_formset.management_form }}
+                                {% for form in checkpoint_formset %}
+                                    {{ form.as_p }}
+                                {% endfor %}
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">Создать</button>
+                                </div>
                             </form>
                         </div>
                     </div>

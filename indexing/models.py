@@ -75,15 +75,13 @@ class List_Of_Control_Activities(models.Model):
     course = models.IntegerField(verbose_name='Курс')
     semester = models.IntegerField(verbose_name='Семестр')
     group = models.ForeignKey(Group, verbose_name='Группа', on_delete=models.CASCADE)
-    check_point_date_start = models.DateField(verbose_name='Контрольная точка #1')
-    check_point_date_end = models.DateField(verbose_name='Контрольная точка #2')
 
     class Meta:
-        verbose_name = ' Лист контрольных мероприятий'
-        verbose_name_plural = ' Лист контрольных мероприятий'
+        verbose_name = 'Лист контрольных мероприятий'
+        verbose_name_plural = 'Листы контрольных мероприятий'
 
     def __str__(self):
-        return """  Лист контрольных мероприятий {}""".format(self.group.title)
+        return """ЛКМ {} / {}""".format(self.group.title, self.date_of_approval)
 
 
 class List_Of_Control_Activities_Value(models.Model):
@@ -108,3 +106,163 @@ class List_Of_Control_Activities_Value(models.Model):
 
     def __str__(self):
         return """  Лист контрольных мероприятий """
+
+
+class GradeService(models.Model):
+    """Оценочное средство"""
+    name = models.CharField(
+        verbose_name='Название',
+        blank=False,
+        null=False,
+        max_length=350,
+        unique=True,
+    )
+
+    class Meta:
+        verbose_name = 'Оценочное средство'
+        verbose_name_plural = 'Оценочные средства'
+
+    def __str__(self):
+        return self.name
+
+
+class OrderHolding(models.Model):
+    """Порядок проведения"""
+    description = models.TextField(
+        verbose_name='Описание',
+        blank=False,
+        null=False,
+        unique=True,
+    )
+
+    class Meta:
+        verbose_name = 'Порядок проведения'
+        verbose_name_plural = 'Порядки проведения'
+
+    def __str__(self):
+        return self.description
+
+
+class FormHolding(models.Model):
+    """Форма проведения"""
+    description = models.TextField(
+        verbose_name='Описание',
+        blank=False,
+        null=False,
+        unique=True,
+    )
+
+    class Meta:
+        verbose_name = 'Форма проведения'
+        verbose_name_plural = 'Формы проведения'
+
+    def __str__(self):
+        return self.description
+
+
+class CheckPoint(models.Model):
+    """Контрольная точка"""
+    lca = models.ForeignKey(
+        List_Of_Control_Activities,
+        verbose_name='ЛКМ',
+        on_delete=models.CASCADE,
+        related_name='lca_checkpoints'
+    )
+    number = models.SmallIntegerField(verbose_name='Номер')
+    date = models.DateField(verbose_name='Дата')
+
+    class Meta:
+        verbose_name = 'Контрольная точка'
+        verbose_name_plural = 'Контрольные точки'
+
+    def __str__(self):
+        return f'{self.lca} КТ №: {self.number}, Дата: {self.date}'
+
+
+class GradeServiceSet(models.Model):
+    """Группа оценочных средств"""
+    check_point = models.ForeignKey(
+        CheckPoint,
+        verbose_name='Контрольная точка',
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+    )
+    grade_service = models.ForeignKey(
+        GradeService,
+        verbose_name='Оценочное средство',
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+    )
+    form_holding = models.ForeignKey(
+        FormHolding,
+        verbose_name='Форма проведения',
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+    )
+    order_holding = models.ForeignKey(
+        OrderHolding,
+        verbose_name='Порядок проведения',
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+    )
+
+    evaluation_quantity = models.IntegerField(verbose_name='Количество')
+    evaluation_rate = models.FloatField(verbose_name='Баллов за единицу')
+    evaluation_scale = models.TextField(
+        verbose_name='Шкала оценивания',
+        null=True,
+        blank=True,
+    )
+
+    evaluation_criteria = models.TextField(verbose_name='Критерии оценивания')
+
+    class Meta:
+        verbose_name = 'Группа оценочных средств'
+        verbose_name_plural = 'Группы оценочных средств'
+
+    def __str__(self):
+        return f'{self.check_point} - {self.grade_service}'
+
+
+class GradeItem(models.Model):
+    """Занятие (оценочное средство)"""
+    grade_service_set = models.ForeignKey(
+        GradeServiceSet,
+        verbose_name='Группа оценочных стредств',
+        on_delete=models.CASCADE,
+        related_name='lca_grade_items'
+    )
+    date = models.DateField(
+        blank=True,
+        null=True,
+        verbose_name='Дата занятия',
+    )
+
+    class Meta:
+        verbose_name = 'Занятие (оценочное средство)'
+        verbose_name_plural = 'Занятия (оценочное средства)'
+
+    def __str__(self):
+        return f'{self.grade_service_set} - {self.date}'
+
+
+class GradeResult(models.Model):
+    """Результаты занятия"""
+    grade_item = models.ForeignKey(
+        GradeItem,
+        verbose_name='занятие',
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE
+    )
+    student = models.ForeignKey(
+        Students,
+        verbose_name='студент',
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE
+    )

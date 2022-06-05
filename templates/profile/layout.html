@@ -13,7 +13,8 @@
     <link rel="stylesheet" href="/static/assets/css/libs.min.css">
 
     <!-- Custom Css -->
-    <link rel="stylesheet" href="/static/assets/css/hope-ui.css?v=1.0.2">  </head>
+    <link rel="stylesheet" href="/static/assets/css/hope-ui.css?v=1.0.2">
+</head>
 <body class="  ">
 <!-- loader Start -->
 <div id="loading">
@@ -23,7 +24,7 @@
 </div>
 <!-- loader END -->
 
-<aside class="sidebar sidebar-default navs-rounded-all ">
+<aside class="sidebar sidebar-default navs-rounded-all {% block aside_style %}{% endblock %}">
     <div class="sidebar-header d-flex align-items-center justify-content-start">
         <a href="#" class="navbar-brand">
             <!--Logo start-->
@@ -87,7 +88,7 @@
                             </svg>
                         </i>
                     </a>
-                    <ul class="sub-nav collapse" id="sidebar-form" data-bs-parent="#sidebar" style="">
+                    <ul class="sub-nav collapse" id="sidebar-form" data-bs-parent="#sidebar">
                         <li class="nav-item">
                             <a class="nav-link " href="{% url 'Index:group' %}">
                                 <i class="icon">
@@ -97,7 +98,7 @@
                                         </g>
                                     </svg>
                                 </i>
-                                <i class="sidenav-mini-icon"> С </i>
+                                <i class="sidenav-mini-icon"> Г </i>
                                 <span class="item-name">Создать группу</span>
                             </a>
                         </li>
@@ -110,7 +111,7 @@
                                         </g>
                                     </svg>
                                 </i>
-                                <i class="sidenav-mini-icon"> С </i>
+                                <i class="sidenav-mini-icon"> У </i>
                                 <span class="item-name">Создать ученика</span>
                             </a>
                         </li>
@@ -123,7 +124,7 @@
                                         </g>
                                     </svg>
                                 </i>
-                                <i class="sidenav-mini-icon"> С </i>
+                                <i class="sidenav-mini-icon"> З </i>
                                 <span class="item-name">Создать занятие</span>
                             </a>
                         </li>
@@ -136,8 +137,47 @@
                                         </g>
                                     </svg>
                                 </i>
-                                <i class="sidenav-mini-icon"> В </i>
+                                <i class="sidenav-mini-icon"> Б </i>
                                 <span class="item-name">Выставить баллы</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{% url 'Index:gradeservice-create' %}">
+                                <i class="icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
+                                        <g>
+                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
+                                        </g>
+                                    </svg>
+                                </i>
+                                <i class="sidenav-mini-icon"> ОС </i>
+                                <span class="item-name">Создать оценочное средство</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{% url 'Index:formholding-create' %}">
+                                <i class="icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
+                                        <g>
+                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
+                                        </g>
+                                    </svg>
+                                </i>
+                                <i class="sidenav-mini-icon"> ФП </i>
+                                <span class="item-name">Создать форму проведения</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{% url 'Index:orderholding-create' %}">
+                                <i class="icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
+                                        <g>
+                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
+                                        </g>
+                                    </svg>
+                                </i>
+                                <i class="sidenav-mini-icon"> ПП </i>
+                                <span class="item-name">Создать порядок проведения</span>
                             </a>
                         </li>
                     </ul>
@@ -157,7 +197,7 @@
                             </svg>
                         </i>
                     </a>
-                    <ul class="sub-nav collapse" id="sidebar-widget" data-bs-parent="#sidebar" style="">
+                    <ul class="sub-nav collapse" id="sidebar-widget" data-bs-parent="#sidebar">
                         <li class="nav-item">
                             <a class="nav-link " href="{% url 'Index:list' %}">
                                 <i class="icon">
@@ -169,6 +209,19 @@
                                 </i>
                                 <i class="sidenav-mini-icon"> С </i>
                                 <span class="item-name">Создать лист</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{% url 'Index:lca-create' %}">
+                                <i class="icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
+                                        <g>
+                                            <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
+                                        </g>
+                                    </svg>
+                                </i>
+                                <i class="sidenav-mini-icon"> С </i>
+                                <span class="item-name">Создать ЛКМ</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -215,7 +268,7 @@
                             </svg>
                         </i>
                     </a>
-                    <ul class="sub-nav collapse" id="sidebar-table" data-bs-parent="#sidebar" style="">
+                    <ul class="sub-nav collapse" id="sidebar-table" data-bs-parent="#sidebar">
                         <li class="nav-item ">
                             <a class="nav-link" href="{% url 'Index:table' %}">
                                 <i class="icon">
@@ -511,5 +564,8 @@
 
 <!-- app JavaScript -->
 <script src="/static/assets/js/app.js"></script>
+
+{% block js %}{% endblock %}
+
 </body>
 </html>

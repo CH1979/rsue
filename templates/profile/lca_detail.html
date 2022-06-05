@@ -1,0 +1,90 @@
+{% extends 'profile/layout.html' %}
+
+{% block aside_style %}
+    sidebar-mini
+{% endblock %}
+
+{% block content %}
+{% with lca=list_of_control_activities %}
+    <div class="conatiner-fluid mt-n5 py-0">
+        <div>
+            <div class="row">
+                <div class="mt-n5 py-0">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <div class="header-title">
+                                <h4 class="card-title">Лист контрольных мероприятий</h4>
+                                <a href="{% url 'Index:gss-create' lca.id %}">Добавить оценочные средства</a> |
+                                <a href="{% url 'Index:lca-print' lca.id %}" target="_blank">Печатать ЛКМ</a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {% with checkpoints=lca.lca_checkpoints.all %}
+                            <table class="table">
+                                <tr>
+                                    <td rowspan="3">
+                                        Студент
+                                    </td>
+                                    {% for cp in checkpoints %}
+                                        {% for gss in cp.gradeserviceset_set.all %}
+                                            <td class="p-0 text-center" colspan="{{ gss.lca_grade_items.count }}">
+                                                КТ {{ cp.number }} - {{ cp.date }}
+                                            </td>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    {% for cp in checkpoints %}
+                                        {% for gss in cp.gradeserviceset_set.all %}
+                                            <td class="p-0 text-center" colspan="{{ gss.lca_grade_items.count }}">
+                                                {{ gss.grade_service }}
+                                            </td>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    {% for cp in checkpoints %}
+                                        {% for gss in cp.gradeserviceset_set.all %}
+                                            {% for item in gss.lca_grade_items.all %}
+                                                <td class="p-0 text-center">
+                                                    <input type="date" class="form-control p-0" value="{{ item.date }}" onchange="changeDate({{ item.id }})">
+                                                </td>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                                {% for student in lca.group.students_set.all %}
+                                    <tr>
+                                        <td>
+                                            {{ student.full_name }}
+                                        </td>
+
+                                        {% for cp in checkpoints %}
+                                            {% for gss in cp.gradeserviceset_set.all %}
+                                                {% for item in gss.lca_grade_items.all %}
+                                                    <td class="p-0 text-center">
+                                                        <input type="text" class="form-control" id="gr_{{ student.id }}_{{ item.id }}">
+                                                    </td>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endwith %}
+{% endblock %}
+
+{% block js %}
+<script>
+    function changeDate(item_id) {
+        console.log(item_id)
+    }
+</script>
+{% endblock %}
