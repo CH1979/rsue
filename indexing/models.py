@@ -211,13 +211,18 @@ class GradeServiceSet(models.Model):
     )
 
     evaluation_quantity = models.IntegerField(verbose_name='Количество')
-    evaluation_rate = models.FloatField(verbose_name='Баллов за единицу')
+    evaluation_rate = models.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        null=False,
+        blank=False,
+        verbose_name='Баллов за единицу'
+    )
     evaluation_scale = models.TextField(
         verbose_name='Шкала оценивания',
         null=True,
         blank=True,
     )
-
     evaluation_criteria = models.TextField(verbose_name='Критерии оценивания')
 
     class Meta:
@@ -245,6 +250,7 @@ class GradeItem(models.Model):
     class Meta:
         verbose_name = 'Занятие (оценочное средство)'
         verbose_name_plural = 'Занятия (оценочное средства)'
+        ordering = ['grade_service_set', 'date']
 
     def __str__(self):
         return f'{self.grade_service_set} - {self.date}'
@@ -265,4 +271,11 @@ class GradeResult(models.Model):
         null=False,
         blank=False,
         on_delete=models.CASCADE
+    )
+    value = models.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        null=False,
+        blank=False,
+        verbose_name='оценка'
     )

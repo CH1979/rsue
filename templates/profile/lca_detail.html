@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block content %}
+{% csrf_token %}
 {% with lca=list_of_control_activities %}
     <div class="conatiner-fluid mt-n5 py-0">
         <div>
@@ -20,14 +21,14 @@
                         </div>
                         <div class="card-body">
                             {% with checkpoints=lca.lca_checkpoints.all %}
-                            <table class="table">
+                            <table class="table table-bordered table-sm">
                                 <tr>
                                     <td rowspan="3">
                                         Студент
                                     </td>
                                     {% for cp in checkpoints %}
                                         {% for gss in cp.gradeserviceset_set.all %}
-                                            <td class="p-0 text-center" colspan="{{ gss.lca_grade_items.count }}">
+                                            <td class="p-0 text-center" colspan="{{ gss.evaluation_quantity }}">
                                                 КТ {{ cp.number }} - {{ cp.date }}
                                             </td>
                                         {% endfor %}
@@ -36,7 +37,7 @@
                                 <tr>
                                     {% for cp in checkpoints %}
                                         {% for gss in cp.gradeserviceset_set.all %}
-                                            <td class="p-0 text-center" colspan="{{ gss.lca_grade_items.count }}">
+                                            <td class="p-0 text-center" colspan="{{ gss.evaluation_quantity }}">
                                                 {{ gss.grade_service }}
                                             </td>
                                         {% endfor %}
@@ -47,7 +48,7 @@
                                         {% for gss in cp.gradeserviceset_set.all %}
                                             {% for item in gss.lca_grade_items.all %}
                                                 <td class="p-0 text-center">
-                                                    <input type="date" class="form-control p-0" value="{{ item.date }}" onchange="changeDate({{ item.id }})">
+                                                    <input type="date" class="form-control p-0" value="{{ item.date|date:'Y-m-d' }}" id="item_{{ item.id }}" onchange="changeDate(this)">
                                                 </td>
                                             {% endfor %}
                                         {% endfor %}
@@ -78,13 +79,53 @@
             </div>
         </div>
     </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-body" id="toast-message">
+            </div>
+        </div>
+    </div>
+
 {% endwith %}
 {% endblock %}
 
 {% block js %}
 <script>
-    function changeDate(item_id) {
-        console.log(item_id)
+    const url = new URL(document.documentURI);
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    const toastElement = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+    
+    function showError() {
+        const toast = new bootstrap.Toast(toastElement, {delay: 5000});
+        toastElement.className = 'toast text-white bg-danger';
+        toastMessage.innerText = "Ошибка при сохранении!";
+        toast.show();
+    }
+    
+    function showSuccess() {
+        const toast = new bootstrap.Toast(toastElement, {delay: 700});
+        toastElement.className = 'toast';
+        toastMessage.innerText = "Сохранено";
+        toast.show();
+    }
+
+    function changeDate(changedItem) {
+        let date_value = changedItem.value == '' ? null : changedItem.value;
+        let pk = changedItem.id.match(/\d/);
+        let dateAPIUrl = url.origin + `/gradeitems/${pk}/update`;
+        let response = fetch(dateAPIUrl, {
+            method: 'PUT',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify({'date': date_value})
+        })
+            .then(response => showSuccess())
+            .catch(error => showError());
     }
 </script>
 {% endblock %}

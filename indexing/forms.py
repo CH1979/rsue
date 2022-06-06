@@ -116,8 +116,11 @@ class GSSForm(forms.ModelForm):
         model = GradeServiceSet
         fields = '__all__'
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, pk, *args, **kwargs):
         super(GSSForm, self).__init__(*args, **kwargs)
+        self.fields['check_point'].queryset = CheckPoint.objects.filter(
+            lca_id=pk
+        )
         fields_with_select = [
             'check_point',
             'grade_service',

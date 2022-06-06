@@ -1,5 +1,3 @@
-from itertools import islice
-
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
@@ -9,6 +7,7 @@ from django.views.generic import (
     ListView,
     DeleteView,
 )
+from rest_framework.generics import CreateAPIView, UpdateAPIView
 
 from .forms import (
     AddStudent,
@@ -22,6 +21,7 @@ from .forms import (
     LCAForm
 )
 from .models import *
+from .serialisers import GradeItemSerializer, GradeResultSerializer
 
 
 def index(request):
@@ -298,6 +298,11 @@ class GradeServiceSetCreateView(CreateView):
     form_class = GSSForm
     template_name = 'profile/create_gss.html'
 
+    def get_form_kwargs(self):
+        kwargs = super(GradeServiceSetCreateView, self).get_form_kwargs()
+        kwargs['pk'] = self.kwargs['pk']
+        return kwargs
+
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.save()
@@ -306,7 +311,21 @@ class GradeServiceSetCreateView(CreateView):
         objs = [GradeItem(grade_service_set=self.object) for i in range(n)]
         GradeItem.objects.bulk_create(objs)
 
-        return redirect(
+        return redirect(reverse(
             'Index:lca-detail',
             kwargs={'pk': self.object.check_point.lca.pk}
+            )
         )
+
+
+class GradeItemUpdateAPIView(UpdateAPIView):
+    serializer_class = GradeItemSerializer
+    queryset = GradeItem.objects.all()
+
+
+class GradeResultCreateAPIView(CreateAPIView):
+    serializer_class = GradeResultSerializer
+
+
+class GradeResultUpdateAPIView(UpdateAPIView):
+    serializer_class = GradeResultSerializer
