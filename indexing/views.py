@@ -7,7 +7,8 @@ from django.views.generic import (
     ListView,
     DeleteView,
 )
-from rest_framework.generics import CreateAPIView, UpdateAPIView
+from rest_framework import viewsets
+from rest_framework.generics import UpdateAPIView
 
 from .forms import (
     AddStudent,
@@ -323,9 +324,12 @@ class GradeItemUpdateAPIView(UpdateAPIView):
     queryset = GradeItem.objects.all()
 
 
-class GradeResultCreateAPIView(CreateAPIView):
+class GradeResultViewSet(viewsets.ModelViewSet):
     serializer_class = GradeResultSerializer
-
-
-class GradeResultUpdateAPIView(UpdateAPIView):
-    serializer_class = GradeResultSerializer
+    
+    def get_queryset(self):
+        pk=self.kwargs['lca_id']
+        queryset = GradeResult.objects.filter(
+            grade_item__grade_service_set__check_point__lca=pk
+        )
+        return queryset

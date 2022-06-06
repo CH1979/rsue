@@ -272,10 +272,18 @@ class GradeResult(models.Model):
         blank=False,
         on_delete=models.CASCADE
     )
-    value = models.DecimalField(
+    score = models.DecimalField(
         max_digits=3,
         decimal_places=1,
         null=False,
         blank=False,
         verbose_name='оценка'
     )
+
+    class Meta:
+        verbose_name = 'Результат (оценка)'
+        verbose_name_plural = 'Результаты (оценки)'
+        unique_together = ['grade_item', 'student']
+
+    def __str__(self):
+        return f'{self.student}, {self.grade_item} - {self.score}'

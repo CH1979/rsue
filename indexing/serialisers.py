@@ -1,3 +1,4 @@
+from venv import create
 from rest_framework import serializers
 
 from .models import GradeItem, GradeResult
@@ -13,3 +14,16 @@ class GradeResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = GradeResult
         fields = '__all__'
+        validators = []
+
+    def create(self, validated_data):
+        student = validated_data['student']
+        grade_item = validated_data['grade_item']
+        score = validated_data['score']
+        grade_result, created = GradeResult.objects.update_or_create(
+            student=student,
+            grade_item=grade_item,
+            defaults={'score': score}
+        )
+        return grade_result
+

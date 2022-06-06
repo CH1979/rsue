@@ -1,6 +1,13 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework import routers
+
 from .views import *
+
+
 app_name = 'Index'
+
+router = routers.DefaultRouter()
+router.register('graderesult', GradeResultViewSet, basename='graderesult')
 
 urlpatterns = [
     path('', index, name='index'),
@@ -29,5 +36,5 @@ urlpatterns = [
     path('accounts/profile/pdf', Pdfer.as_view(), name='pdf_gen'),
 
     path('gradeitems/<int:pk>/update', GradeItemUpdateAPIView.as_view()),
-
+    path('lca/<int:lca_id>/', include(router.urls)),
 ]
