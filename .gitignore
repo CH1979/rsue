@@ -2,3 +2,7 @@ env/
 __pycache__/
 
 *.pyc
+
+dump.sql
+database.db
+db.sqlite3
