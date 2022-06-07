@@ -129,6 +129,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = '/home/www/django/src/'
+
 STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
