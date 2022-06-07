@@ -11,7 +11,7 @@ router.register('graderesult', GradeResultViewSet, basename='graderesult')
 
 urlpatterns = [
     path('', index, name='index'),
-    path('accounts/profile', profile, name='profile'),
+    path('accounts/profile/', profile, name='profile'),
     path('accounts/profile/create-group', CreateGroup.as_view(), name='group'),
     path('accounts/profile/<int:pk>/update', GroupUpdateView.as_view(), name='group-update'),
     path('accounts/profile/student-groups', GroupListView.as_view(), name='student-groups'),
