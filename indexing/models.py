@@ -1,13 +1,17 @@
-from urllib import request
-
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 
 
-class Group(models.Model):
+class StudentGroup(models.Model):
     """ Группа студентов """
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Учитель')
-    title = models.CharField(verbose_name='Название группы', max_length=1000)
+    teacher = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        verbose_name='Учитель',
+        related_name='student_groups',
+        related_query_name='student_groups'
+    )
+    title = models.CharField(verbose_name='Название группы', unique=True, max_length=1000)
 
     class Meta:
         verbose_name = 'Группы студентов'
@@ -23,7 +27,7 @@ class Lecture(models.Model):
     title = models.CharField(verbose_name='Тема занятия', max_length=1000, help_text='Теория большого взрыва')
     date = models.DateField(verbose_name='Дата проведения')
     time = models.IntegerField(verbose_name='Длительность занятия', default=45)
-    group = models.ManyToManyField(Group, verbose_name='Группа студентов', help_text='Это список доступных групп, '
+    group = models.ManyToManyField(StudentGroup, verbose_name='Группа студентов', help_text='Это список доступных групп, '
                                                                                      'выберите у какой группы будет '
                                                                                      'занятие')
 
@@ -39,7 +43,7 @@ class Students(models.Model):
     """ Студенты """
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Учитель')
     full_name = models.CharField(verbose_name='Фамилия Имя', max_length=1000, help_text='Савельев Максим')
-    key = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name='Группа')
+    key = models.ForeignKey(StudentGroup, on_delete=models.CASCADE, verbose_name='Группа')
 
     class Meta:
         verbose_name = 'Студента'
@@ -74,7 +78,7 @@ class List_Of_Control_Activities(models.Model):
     discipline = models.CharField(max_length=350, verbose_name='Дисциплина')
     course = models.IntegerField(verbose_name='Курс')
     semester = models.IntegerField(verbose_name='Семестр')
-    group = models.ForeignKey(Group, verbose_name='Группа', on_delete=models.CASCADE)
+    group = models.ForeignKey(StudentGroup, verbose_name='Группа', on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Лист контрольных мероприятий'

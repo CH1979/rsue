@@ -1,3 +1,4 @@
+from django.db.models import Sum
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
@@ -9,6 +10,8 @@ from django.views.generic import (
 )
 from rest_framework import viewsets
 from rest_framework.generics import UpdateAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .forms import (
     AddStudent,
@@ -19,10 +22,15 @@ from .forms import (
     AddList,
     CheckPointFormSet,
     GSSForm,
-    LCAForm
+    LCAForm,
+    UpdateGroupStudent,
 )
 from .models import *
-from .serialisers import GradeItemSerializer, GradeResultSerializer
+from .serialisers import (
+    GradeItemSerializer,
+    GradeResultSerializer,
+    ResultSerializer
+)
 
 
 def index(request):
@@ -70,6 +78,18 @@ class CreateGroup(CreateView):
             return handler(request, *args, **kwargs)
         else:
             return redirect("login")
+
+
+class GroupListView(ListView):
+    model = StudentGroup
+    template_name = 'profile/student_groups.html'
+
+
+class GroupUpdateView(UpdateView):
+    model = StudentGroup
+    form_class = UpdateGroupStudent
+    success_url = '/'
+    template_name = 'profile/update_group.html'
 
 
 class CreateStudent(CreateView):
@@ -269,6 +289,23 @@ class LCAPrintView(DetailView):
     template_name = 'pdf/lca_detail.html'
 
 
+class PerformancePrintView(DetailView):
+    model = List_Of_Control_Activities
+    template_name = 'pdf/performance.html'
+
+    # def get_context_data(self, **kwargs):
+    #     pk = self.kwargs['pk']
+    #     context = super().get_context_data(**kwargs)
+    #     context['results'] = GradeResult.objects.filter(
+    #         grade_item__grade_service_set__check_point__lca=pk
+    #     ).values(
+    #         'student',
+    #         'grade_item__grade_service_set__check_point'
+    #     ).annotate(result=Sum('score'))
+    #     return context
+
+
+
 class LCADeleteView(DeleteView):
     model = List_Of_Control_Activities
     success_url = reverse_lazy('Index:table-list')
@@ -328,8 +365,17 @@ class GradeResultViewSet(viewsets.ModelViewSet):
     serializer_class = GradeResultSerializer
     
     def get_queryset(self):
-        pk=self.kwargs['lca_id']
+        pk = self.kwargs['lca_id']
         queryset = GradeResult.objects.filter(
             grade_item__grade_service_set__check_point__lca=pk
         )
         return queryset
+
+
+class ResultAPIView(APIView):
+    def get(self, request, lca_id,format=None):
+        rates = GradeResult.objects.filter(
+            grade_item__grade_service_set__check_point__lca=lca_id
+        ).values('student_id', 'grade_item__grade_service_set__check_point').annotate(result=Sum('score'))
+        serializer = ResultSerializer(rates, many=True)
+        return Response(serializer.data)

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from .models import (
     CheckPoint,
     GradeServiceSet,
-    Group,
+    StudentGroup,
     Students,
     Lecture,
     List_Of_Control_Activities,
@@ -18,8 +18,19 @@ class AddGroupStudent(forms.ModelForm):
     """ Форма создания группы учеников """
 
     class Meta:
-        model = Group
+        model = StudentGroup
         fields = "__all__"
+
+
+class UpdateGroupStudent(forms.ModelForm):
+    class Meta:
+        model = StudentGroup
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateGroupStudent, self).__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = "form-control"
 
 
 class AddStudent(forms.ModelForm):
@@ -98,10 +109,10 @@ class LCAForm(forms.ModelForm):
         super(LCAForm, self).__init__(*args, **kwargs)
 
         self.fields['teacher'].queryset = User.objects.filter(
-            id=request.user.id
+            id__in=[request.user.id]
         )
-        self.fields['group'].queryset = Group.objects.filter(
-            teacher=request.user
+        self.fields['group'].queryset = StudentGroup.objects.filter(
+            teacher__in=[request.user]
         )
 
         for visible in self.visible_fields():

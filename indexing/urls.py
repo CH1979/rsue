@@ -13,6 +13,8 @@ urlpatterns = [
     path('', index, name='index'),
     path('accounts/profile', profile, name='profile'),
     path('accounts/profile/create-group', CreateGroup.as_view(), name='group'),
+    path('accounts/profile/<int:pk>/update', GroupUpdateView.as_view(), name='group-update'),
+    path('accounts/profile/student-groups', GroupListView.as_view(), name='student-groups'),
     path('accounts/profile/create-student', CreateStudent.as_view(), name='student'),
     path('accounts/profile/create-lecture', CreateLecture.as_view(), name='Lecture'),
     path('accounts/profile/create-grade', CreateGrade.as_view(), name='grade'),
@@ -22,6 +24,7 @@ urlpatterns = [
     path('accounts/profile/lca/create', LCACreateView.as_view(), name='lca-create'),
     path('accounts/profile/lca/<int:pk>', LCADetailView.as_view(), name='lca-detail'),
     path('accounts/profile/lca/<int:pk>/print', LCAPrintView.as_view(), name='lca-print'),
+    path('accounts/profile/lca/<int:pk>/performance', PerformancePrintView.as_view(), name='performance'),
     path('accounts/profile/lca/<int:pk>/delete/', LCADeleteView.as_view(), name='lca-delete'),
 
     path('accounts/profile/lca/<int:pk>/gss/create', GradeServiceSetCreateView.as_view(), name='gss-create'),
@@ -37,4 +40,5 @@ urlpatterns = [
 
     path('gradeitems/<int:pk>/update', GradeItemUpdateAPIView.as_view()),
     path('lca/<int:lca_id>/', include(router.urls)),
+    path('lca/<int:lca_id>/result', ResultAPIView.as_view()),
 ]

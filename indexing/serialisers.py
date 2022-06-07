@@ -27,3 +27,7 @@ class GradeResultSerializer(serializers.ModelSerializer):
         )
         return grade_result
 
+class ResultSerializer(serializers.Serializer):
+    student_id = serializers.IntegerField()
+    grade_item__grade_service_set__check_point = serializers.IntegerField()
+    result = serializers.DecimalField(max_digits=3, decimal_places=1)
