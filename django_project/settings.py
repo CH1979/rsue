@@ -23,13 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'fuUuTJboappZ4AYWihR8HeBfGWd1BKm3WNBeiYvocJisWkuiqpiqRNx0q8bYHXb9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     '80.78.244.111',
     '2a00:f940:2:4:2::3dff',
     '80-78-244-111.cloudvps.regruhosting.ru',
-    '127.0.0.1'
 ]
 
 
@@ -129,7 +128,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-STATIC_ROOT = '/home/www/django/src/'
+STATIC_ROOT = '/home/www/django/src/static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / 'static'
